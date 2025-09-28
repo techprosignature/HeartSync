@@ -1,0 +1,5 @@
+<drawables xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <bitmap id="splitView" filename="splitView.svg" dithering="none" />
+    <bitmap id="splitViewGreen" filename="splitViewGreen.svg" dithering="none" />
+    <bitmap id="splitViewBlue" filename="splitViewBlue.svg" dithering="none" />
+</drawables>

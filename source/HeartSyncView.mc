@@ -49,14 +49,25 @@ class HeartSyncView extends WatchUi.View {
         // Call the parent onUpdate function to redraw the layout
         dc.clear();
 
+        var background = WatchUi.loadResource(Rez.Drawables.splitViewBlue) as BitmapResource;
+        dc.drawBitmap(0, 0, background);
+
         var sensorInfo = Sensor.getInfo();
         if(sensorInfo has :heartRate && sensorInfo.heartRate != null){
             heartRate = sensorInfo.heartRate;
             // You can now use the heart rate value as needed
             // For example, display it on the screen or log it
         }
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_MEDIUM, "Heart Rate: " + heartRate, Graphics.TEXT_JUSTIFY_CENTER);
+        
+        dc.setColor(0x94FA7F, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.21 - 20, Graphics.FONT_SMALL, "Elizabeth", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.setColor(0x5DA3FF, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.79 - 20, Graphics.FONT_SMALL, "Phineas", Graphics.TEXT_JUSTIFY_CENTER);
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.34 - 20, Graphics.FONT_SMALL, "--", Graphics.TEXT_JUSTIFY_CENTER);
+
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.66 - 20, Graphics.FONT_SMALL, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     // Called when this View is removed from the screen. Save the
