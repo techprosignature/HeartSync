@@ -3,14 +3,14 @@
     <properties>
         <property id="username_prop" type="string">debugger</property>
         <property id="nickname_prop" type="string">DEBUG</property>
-        <property id="friend_username_prop" type="string">squeakycheese</property>
+        <property id="friend_username_prop" type="string"></property>
         <property id="vibration_strength_prop" type="number">25</property>
         <property id="whovibrate_prop" type="number">1</property>
     </properties>
 
     <strings>
        <string id="username_title">Username (Public)</string>
-       <string id="nickname_title">Name (Private)</string>
+       <string id="nickname_title">Name</string>
        <string id="friend_username_title">Friend's Username</string>
        <string id="vibration_strength_title">Vibration Strength (0-100)</string>
     </strings>
