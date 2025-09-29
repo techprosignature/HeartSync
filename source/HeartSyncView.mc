@@ -2,15 +2,18 @@ import Toybox.Graphics;
 import Toybox.WatchUi;
 import Toybox.Sensor;
 import Toybox.Timer;
+import Toybox.Lang;
 
 class HeartSyncView extends WatchUi.View {
 
     private var heartRate = 60;
     var heartRateTimer = new Timer.Timer();
+    var nickname = "User";
 
     function initialize() {
         Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
         var viewRefreshTimer = new Timer.Timer();
+        nickname = Application.Properties.getValue("nickname_prop");
         viewRefreshTimer.start(method(:onUpdateTimer), 1000, true);
         heartRateTimer.start(method(:onHeartRateUpdate), 1000, false);
         View.initialize();
@@ -28,7 +31,7 @@ class HeartSyncView extends WatchUi.View {
             heartRate = sensorInfo.heartRate;
             // You can now use the heart rate value as needed
             // For example, display it on the screen or log it
-            Attention.vibrate([new Attention.VibeProfile(25, 100)]);
+            Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
         }
         heartRateTimer.start(method(:onHeartRateUpdate), 60000 / heartRate, false);
     }
@@ -42,6 +45,18 @@ class HeartSyncView extends WatchUi.View {
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() as Void {
+    }
+
+    function onReceive(responseCode as Number, data as Dictionary?) as Void{
+       if (responseCode == 200) {
+           System.println("Request Successful");                   // print success
+              System.println("Response Data: " + data); // print response data
+       }
+       else {
+           System.println("Response: " + responseCode);            // print response code
+           System.println("Request Failed: " + data); // print error message
+       }
+
     }
 
     // Update the view
@@ -60,14 +75,34 @@ class HeartSyncView extends WatchUi.View {
         }
         
         dc.setColor(0x94FA7F, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.21 - 20, Graphics.FONT_SMALL, "Elizabeth", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.21 - 20, Graphics.FONT_SMALL, "", Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(0x5DA3FF, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.79 - 20, Graphics.FONT_SMALL, "Phineas", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.79 - 20, Graphics.FONT_SMALL, nickname, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.34 - 20, Graphics.FONT_SMALL, "--", Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.66 - 20, Graphics.FONT_SMALL, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
+
+        // Push data to server
+        var url = "https://heartsync-pt41.onrender.com/heartrate";
+        var params = {
+            "username" => Application.Properties.getValue("username_prop"),
+            "nickname" => Application.Properties.getValue("nickname_prop"),
+            "friend_username" => Application.Properties.getValue("friend_username_prop"),
+            "heartrate" => heartRate,
+        };
+
+        var options = {
+            :method => Communications.HTTP_REQUEST_METHOD_POST,
+            :headers => { "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON },
+            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
+        };
+
+        var responseCallback = method(:onReceive);
+
+        Communications.makeWebRequest(url, params, options, responseCallback);
+
     }
 
     // Called when this View is removed from the screen. Save the

@@ -1,0 +1,31 @@
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+
+    <properties>
+        <property id="username_prop" type="string">techpro248</property>
+        <property id="nickname_prop" type="string">Phineas</property>
+        <property id="friend_username_prop" type="string"></property>
+        <property id="vibration_strength_prop" type="number">25</property>
+    </properties>
+
+    <strings>
+       <string id="username_title">Username (Public)</string>
+       <string id="nickname_title">Name (Private)</string>
+       <string id="friend_username_title">Friend's Username</string>
+       <string id="vibration_strength_title">Vibration Strength (0-100)</string>
+    </strings>
+
+    <settings>
+    <setting propertyKey="@Properties.nickname_prop" title="@Strings.nickname_title">
+            <settingConfig type="alphanumeric" required="true" />
+        </setting>
+        <setting propertyKey="@Properties.username_prop" title="@Strings.username_title">
+            <settingConfig type="alphanumeric" required="true" />
+        </setting>
+        <setting propertyKey="@Properties.friend_username_prop" title="@Strings.friend_username_title">
+            <settingConfig type="alphanumeric" required="false" />
+        </setting>
+        <setting propertyKey="@Properties.vibration_strength_prop" title="@Strings.vibration_strength_title">
+            <settingConfig type="numeric" min="0" max="100" required="true" />
+        </setting>
+    </settings>
+</resources>
