@@ -36,11 +36,11 @@ class HeartSyncView extends WatchUi.View {
         // Vibrate based on heart rate
         Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
 
-        System.println("who vibrate: " + Application.Storage.getValue("whovibrate_prop"));
-        if(Application.Storage.getValue("whovibrate_prop") == null){
-            Application.Storage.setValue("whovibrate_prop", 1);
+        System.println("who vibrate: " + Application.Properties.getValue("whovibrate_prop"));
+        if(Application.Properties.getValue("whovibrate_prop") == null){
+            Application.Properties.setValue("whovibrate_prop", 1);
         }
-        if(Application.Storage.getValue("whovibrate_prop") == 1){
+        if(Application.Properties.getValue("whovibrate_prop") == 1){
             var vibrateTime = Application.Storage.getValue("friend_heartrate");
             if(vibrateTime == null || vibrateTime == 0){
                 vibrateTime = 12;
@@ -86,7 +86,13 @@ class HeartSyncView extends WatchUi.View {
         // Call the parent onUpdate function to redraw the layout
         dc.clear();
 
-        var background = WatchUi.loadResource(Rez.Drawables.splitViewBlue) as BitmapResource;
+        var background;
+        if(Application.Properties.getValue("whovibrate_prop") == 1){
+            background = WatchUi.loadResource(Rez.Drawables.splitViewGreen) as BitmapResource;
+        }
+        else{
+            background = WatchUi.loadResource(Rez.Drawables.splitViewBlue) as BitmapResource;
+        }
         dc.drawBitmap(0, 0, background);
 
         var sensorInfo = Sensor.getInfo();
