@@ -85,8 +85,13 @@ class HeartSyncView extends WatchUi.View {
             Application.Storage.setValue("friend_status", data["status"]);
        }
        else {
-           System.println("Response: " + responseCode);            // print response code
-           System.println("Request Failed: " + data); // print error message
+           if(responseCode == -101){
+                System.println("Server starting...");
+           }
+           else{
+                System.println("Response: " + responseCode);            // print response code
+                System.println("Request Failed: " + data); // print error message
+           }
        }
 
     }
