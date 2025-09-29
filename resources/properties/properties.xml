@@ -5,6 +5,7 @@
         <property id="nickname_prop" type="string">Phineas</property>
         <property id="friend_username_prop" type="string"></property>
         <property id="vibration_strength_prop" type="number">25</property>
+        <property id="whovibrate_prop" type="number">1</property>
     </properties>
 
     <strings>

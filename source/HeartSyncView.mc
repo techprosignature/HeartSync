@@ -31,9 +31,21 @@ class HeartSyncView extends WatchUi.View {
             heartRate = sensorInfo.heartRate;
             // You can now use the heart rate value as needed
             // For example, display it on the screen or log it
-            Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
+            
         }
-        heartRateTimer.start(method(:onHeartRateUpdate), 60000 / heartRate, false);
+        // Vibrate based on heart rate
+        Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
+
+        if(Application.Storage.getValue("whovibrate_prop") == 1){
+            var vibrateTime = Application.Storage.getValue("friend_heartrate");
+            if(vibrateTime == null || vibrateTime == 0){
+                vibrateTime = 12;
+            }
+            heartRateTimer.start(method(:onHeartRateUpdate), 60000 / vibrateTime, false);
+        }
+        else{
+            heartRateTimer.start(method(:onHeartRateUpdate), 60000 / heartRate, false);
+        }
     }
 
     // Load your resources here
@@ -51,6 +63,10 @@ class HeartSyncView extends WatchUi.View {
        if (responseCode == 200) {
            System.println("Request Successful");                   // print success
               System.println("Response Data: " + data); // print response data
+            Application.Storage.setValue("friend_nickname", data["nickname"]);
+            Application.Storage.setValue("friend_heartrate", data["heartRate"]);
+            Application.Storage.setValue("friend_last_updated", data["timestamp"]);
+            Application.Storage.setValue("friend_status", data["status"]);
        }
        else {
            System.println("Response: " + responseCode);            // print response code
@@ -75,12 +91,12 @@ class HeartSyncView extends WatchUi.View {
         }
         
         dc.setColor(0x94FA7F, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.21 - 20, Graphics.FONT_SMALL, "", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.21 - 20, Graphics.FONT_SMALL, Application.Storage.getValue("friend_nickname"), Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(0x5DA3FF, Graphics.COLOR_TRANSPARENT);
         dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.79 - 20, Graphics.FONT_SMALL, nickname, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.34 - 20, Graphics.FONT_SMALL, "--", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.34 - 20, Graphics.FONT_SMALL, Application.Storage.getValue("friend_heartrate"), Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.66 - 20, Graphics.FONT_SMALL, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
 
