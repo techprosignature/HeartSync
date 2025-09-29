@@ -27,6 +27,25 @@ class HeartSyncView extends WatchUi.View {
     function onUpdateTimer() as Void {
         // Update view
         WatchUi.requestUpdate();
+
+        // Push data to server
+        var url = "https://heartsync-pt41.onrender.com/heartrate";
+        var params = {
+            "username" => Application.Properties.getValue("username_prop"),
+            "nickname" => Application.Properties.getValue("nickname_prop"),
+            "friend_username" => Application.Properties.getValue("friend_username_prop"),
+            "heartrate" => heartRate,
+        };
+
+        var options = {
+            :method => Communications.HTTP_REQUEST_METHOD_POST,
+            :headers => { "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON },
+            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
+        };
+
+        var responseCallback = method(:onReceive);
+
+        Communications.makeWebRequest(url, params, options, responseCallback);
     }
 
     // Handle heart rate vibrations
@@ -139,25 +158,6 @@ class HeartSyncView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.34 - 20, Graphics.FONT_SMALL, friend_heartrate, Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.66 - 20, Graphics.FONT_SMALL, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
-
-        // Push data to server
-        var url = "https://heartsync-pt41.onrender.com/heartrate";
-        var params = {
-            "username" => Application.Properties.getValue("username_prop"),
-            "nickname" => Application.Properties.getValue("nickname_prop"),
-            "friend_username" => Application.Properties.getValue("friend_username_prop"),
-            "heartrate" => heartRate,
-        };
-
-        var options = {
-            :method => Communications.HTTP_REQUEST_METHOD_POST,
-            :headers => { "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON },
-            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
-        };
-
-        var responseCallback = method(:onReceive);
-
-        Communications.makeWebRequest(url, params, options, responseCallback);
 
     }
 
