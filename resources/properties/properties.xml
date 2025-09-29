@@ -1,9 +1,9 @@
 <resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
 
     <properties>
-        <property id="username_prop" type="string">squeakycheese</property>
-        <property id="nickname_prop" type="string">Elizabeth</property>
-        <property id="friend_username_prop" type="string">techpro248</property>
+        <property id="username_prop" type="string">debugger</property>
+        <property id="nickname_prop" type="string">DEBUG</property>
+        <property id="friend_username_prop" type="string">squeakycheese</property>
         <property id="vibration_strength_prop" type="number">25</property>
         <property id="whovibrate_prop" type="number">1</property>
     </properties>
@@ -29,7 +29,7 @@
             <settingConfig type="numeric" min="0" max="100" required="true" />
         </setting>
         <setting  propertyKey="@Properties.whovibrate_prop" title="Who Vibrates?">
-            <settingConfig type="list" required="true">
+            <settingConfig type="list">
                 <listEntry value="0">Me</listEntry>
                 <listEntry value="1">Friend</listEntry>
             </settingConfig>

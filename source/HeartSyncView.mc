@@ -36,14 +36,20 @@ class HeartSyncView extends WatchUi.View {
         // Vibrate based on heart rate
         Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
 
+        System.println("who vibrate: " + Application.Storage.getValue("whovibrate_prop"));
+        if(Application.Storage.getValue("whovibrate_prop") == null){
+            Application.Storage.setValue("whovibrate_prop", 1);
+        }
         if(Application.Storage.getValue("whovibrate_prop") == 1){
             var vibrateTime = Application.Storage.getValue("friend_heartrate");
             if(vibrateTime == null || vibrateTime == 0){
                 vibrateTime = 12;
             }
+            System.println("Vibrate Time: " + vibrateTime);
             heartRateTimer.start(method(:onHeartRateUpdate), 60000 / vibrateTime, false);
         }
         else{
+            System.println("Vibrate Time: " + heartRate);
             heartRateTimer.start(method(:onHeartRateUpdate), 60000 / heartRate, false);
         }
     }
