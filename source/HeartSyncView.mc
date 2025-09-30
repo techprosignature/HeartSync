@@ -9,6 +9,7 @@ class HeartSyncView extends WatchUi.View {
     // Initialize variables needed throughout the view
     private var heartRate = 60;
     private var heartRateTimer = new Timer.Timer();
+    private var status = 0; // 0 = disconnected, 1 = offline, 2 = online
 
     // Set up the view
     function initialize() {
@@ -98,14 +99,39 @@ class HeartSyncView extends WatchUi.View {
        if (responseCode == 200) {
            System.println("Request Successful");                   // print success
               System.println("Response Data: " + data); // print response data
-            Application.Storage.setValue("friend_nickname", data["nickname"]);
-            Application.Storage.setValue("friend_heartrate", data["heartRate"]);
-            Application.Storage.setValue("friend_last_updated", data["timestamp"]);
-            Application.Storage.setValue("friend_status", data["status"]);
+              System.println("Status: " + data["status"]); // print status
+            if("no_data".find(data["status"]) != null){
+                System.println("No data for friend.");
+                status = 1; // offline
+                Application.Storage.setValue("friend_heartrate", null);
+                return;
+            }
+            else if("offline".find(data["status"]) != null){
+                System.println("Friend is offline.");
+                status = 1; // offline
+                Application.Storage.setValue("friend_nickname", data["nickname"]);
+                Application.Storage.setValue("friend_heartrate", null);
+                Application.Storage.setValue("friend_last_updated", data["timestamp"]);
+                Application.Storage.setValue("friend_status", data["status"]);
+            }
+            else{
+                status = 2; // online
+                Application.Storage.setValue("friend_nickname", data["nickname"]);
+                Application.Storage.setValue("friend_heartrate", data["heartRate"]);
+                Application.Storage.setValue("friend_last_updated", data["timestamp"]);
+                Application.Storage.setValue("friend_status", data["status"]);
+            }
        }
        else {
            if(responseCode == -101){
                 System.println("Server starting...");
+                status = 1; // offline
+                Application.Storage.setValue("friend_heartrate", null);
+           }
+           else if(responseCode == -104){
+                System.println("No internet connection.");
+                status = 0; // disconnected
+                Application.Storage.setValue("friend_heartrate", null);
            }
            else{
                 System.println("Response: " + responseCode);            // print response code
@@ -123,12 +149,32 @@ class HeartSyncView extends WatchUi.View {
 
         // Draw background based on who to vibrate for
         var background;
-        if(Application.Properties.getValue("whovibrate_prop") == 1){
-            background = WatchUi.loadResource(Rez.Drawables.splitViewGreen) as BitmapResource;
+
+        // Set label colors based on status
+        var nicknameColor;
+        var friendnameColor;
+
+        if(status == 0){
+            background = WatchUi.loadResource(Rez.Drawables.splitViewDisconnected) as BitmapResource;
+            nicknameColor = 0xAEAEAE;
+            friendnameColor = 0xAEAEAE;
+        }
+        else if(status == 1){
+            background = WatchUi.loadResource(Rez.Drawables.splitViewOffline) as BitmapResource;
+            nicknameColor = 0x5DA3FF;
+            friendnameColor = 0xAEAEAE;
         }
         else{
-            background = WatchUi.loadResource(Rez.Drawables.splitViewBlue) as BitmapResource;
+            nicknameColor = 0x5DA3FF;
+            friendnameColor = 0x94FA7F;
+            if(Application.Properties.getValue("whovibrate_prop") == 1){
+                background = WatchUi.loadResource(Rez.Drawables.splitViewOnlineFriend) as BitmapResource;
+            }
+            else{
+                background = WatchUi.loadResource(Rez.Drawables.splitViewOnlineMe) as BitmapResource;
+            }
         }
+
         dc.drawBitmap(0, 0, background);
 
         // Read heart rate sensor
@@ -149,9 +195,9 @@ class HeartSyncView extends WatchUi.View {
         }
 
         // Draw names
-        dc.setColor(0x94FA7F, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(friendnameColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.21 - 20, Graphics.FONT_SMALL, friend_nickname, Graphics.TEXT_JUSTIFY_CENTER);
-        dc.setColor(0x5DA3FF, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(nicknameColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.79 - 20, Graphics.FONT_SMALL, Application.Properties.getValue("nickname_prop"), Graphics.TEXT_JUSTIFY_CENTER);
 
         // Draw heart rate values

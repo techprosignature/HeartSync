@@ -1,4 +1,0 @@
-<layout id="MainLayout" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
-    <bitmap id="background" x="0" y="0" filename="../drawables/splitView.svg" />
-    <label x="center" y="5" text="User 1" color="0x5DA3FF" justification="Graphics.TEXT_JUSTIFY_CENTER" />
-</layout>
