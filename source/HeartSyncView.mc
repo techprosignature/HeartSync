@@ -7,9 +7,14 @@ import Toybox.Lang;
 class HeartSyncView extends WatchUi.View {
 
     // Initialize variables needed throughout the view
-    private var heartRate = 60;
+    private var heartRate = 124; // default value
     private var heartRateTimer = new Timer.Timer();
     private var status = 0; // 0 = disconnected, 1 = offline, 2 = online
+    private var robotoBoldExtraLarge as FontResource;
+    private var robotoBoldLarge as FontResource;
+
+    (:small) private const size = 0; // small watch
+    (:large) private const size = 1; // large watch
 
     // Set up the view
     function initialize() {
@@ -22,7 +27,12 @@ class HeartSyncView extends WatchUi.View {
 
         // Set up a timer to vibrate based on heart rate
         heartRateTimer.start(method(:onHeartRateUpdate), 1000, false);
+
+        // Load fonts
+        robotoBoldExtraLarge = WatchUi.loadResource(Rez.Fonts.robotoBoldExtraLarge);
+        robotoBoldLarge = WatchUi.loadResource(Rez.Fonts.robotoBoldLarge);
         View.initialize();
+        System.println("Size: " + size);
     }
 
     function onUpdateTimer() as Void {
@@ -33,7 +43,6 @@ class HeartSyncView extends WatchUi.View {
         var url = "https://heartsync-pt41.onrender.com/heartrate";
         var params = {
             "username" => Application.Properties.getValue("username_prop"),
-            "nickname" => Application.Properties.getValue("nickname_prop"),
             "friend_username" => Application.Properties.getValue("friend_username_prop"),
             "heartrate" => heartRate,
         };
@@ -58,9 +67,6 @@ class HeartSyncView extends WatchUi.View {
             heartRate = sensorInfo.heartRate;
         }
 
-        // Vibrate
-        Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
-
         // Handle possible errors in vibration settings
         if(Application.Properties.getValue("whovibrate_prop") == null){
             Application.Properties.setValue("whovibrate_prop", 1);
@@ -74,10 +80,18 @@ class HeartSyncView extends WatchUi.View {
             if(vibrateTime == null || vibrateTime == 0){
                 vibrateTime = 12;
             }
+
+            // Vibrate otherwise
+            else{
+                Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
+            }
             System.println("Vibrate Time: " + vibrateTime);
             heartRateTimer.start(method(:onHeartRateUpdate), 60000 / vibrateTime, false);
         }
+
+        // Always vibrate for self
         else{
+            Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
             System.println("Vibrate Time: " + heartRate);
             heartRateTimer.start(method(:onHeartRateUpdate), 60000 / heartRate, false);
         }
@@ -109,14 +123,12 @@ class HeartSyncView extends WatchUi.View {
             else if("offline".find(data["status"]) != null){
                 System.println("Friend is offline.");
                 status = 1; // offline
-                Application.Storage.setValue("friend_nickname", data["nickname"]);
                 Application.Storage.setValue("friend_heartrate", null);
                 Application.Storage.setValue("friend_last_updated", data["timestamp"]);
                 Application.Storage.setValue("friend_status", data["status"]);
             }
             else{
                 status = 2; // online
-                Application.Storage.setValue("friend_nickname", data["nickname"]);
                 Application.Storage.setValue("friend_heartrate", data["heartRate"]);
                 Application.Storage.setValue("friend_last_updated", data["timestamp"]);
                 Application.Storage.setValue("friend_status", data["status"]);
@@ -129,11 +141,12 @@ class HeartSyncView extends WatchUi.View {
                 Application.Storage.setValue("friend_heartrate", null);
            }
            else if(responseCode == -104){
-                System.println("No internet connection.");
                 status = 0; // disconnected
+                System.println("No internet connection.");
                 Application.Storage.setValue("friend_heartrate", null);
            }
            else{
+                status = 0; // disconnected
                 System.println("Response: " + responseCode);            // print response code
                 System.println("Request Failed: " + data); // print error message
            }
@@ -151,30 +164,37 @@ class HeartSyncView extends WatchUi.View {
         var background;
 
         // Set label colors based on status
-        var nicknameColor;
-        var friendnameColor;
+        var selfColor;
+        var friendColor;
+        var timeColor;
 
+        // Update background and colors based on connection status
         if(status == 0){
-            background = WatchUi.loadResource(Rez.Drawables.splitViewDisconnected) as BitmapResource;
-            nicknameColor = 0xAEAEAE;
-            friendnameColor = 0xAEAEAE;
+            background = WatchUi.loadResource(Rez.Drawables.backgroundDisconnected) as BitmapResource;
+            selfColor = 0xAEAEAE;
+            friendColor = 0xAEAEAE;
+            timeColor = 0xFFFFFF;
         }
         else if(status == 1){
-            background = WatchUi.loadResource(Rez.Drawables.splitViewOffline) as BitmapResource;
-            nicknameColor = 0x5DA3FF;
-            friendnameColor = 0xAEAEAE;
+            background = WatchUi.loadResource(Rez.Drawables.backgroundOffline) as BitmapResource;
+            selfColor = 0x338BFF;
+            friendColor = 0xAEAEAE;
+            timeColor = 0xFFFFFF;
         }
         else{
-            nicknameColor = 0x5DA3FF;
-            friendnameColor = 0x94FA7F;
+            selfColor = 0x338BFF;
+            friendColor = 0x6CF983;
             if(Application.Properties.getValue("whovibrate_prop") == 1){
-                background = WatchUi.loadResource(Rez.Drawables.splitViewOnlineFriend) as BitmapResource;
+                timeColor = 0x000000;
+                background = WatchUi.loadResource(Rez.Drawables.backgroundOnlineFriend) as BitmapResource;
             }
             else{
-                background = WatchUi.loadResource(Rez.Drawables.splitViewOnlineMe) as BitmapResource;
+                timeColor = 0xFFFFFF;
+                background = WatchUi.loadResource(Rez.Drawables.backgroundOnlineMe) as BitmapResource;
             }
         }
 
+        // Draw background
         dc.drawBitmap(0, 0, background);
 
         // Read heart rate sensor
@@ -182,29 +202,61 @@ class HeartSyncView extends WatchUi.View {
         if(sensorInfo has :heartRate && sensorInfo.heartRate != null){
             heartRate = sensorInfo.heartRate;
         }
-        
-        // Handle possible blank nickname and heart rate values
-        var friend_nickname = Application.Storage.getValue("friend_nickname");
-        if(friend_nickname == null){
-            friend_nickname = "";
-        }
 
+        // Handle possible blank values in friend's heart rate
         var friend_heartrate = Application.Storage.getValue("friend_heartrate");
         if(friend_heartrate == null){
             friend_heartrate = "--";
         }
 
         // Draw names
-        dc.setColor(friendnameColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.21 - 20, Graphics.FONT_SMALL, friend_nickname, Graphics.TEXT_JUSTIFY_CENTER);
-        dc.setColor(nicknameColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.79 - 20, Graphics.FONT_SMALL, Application.Properties.getValue("nickname_prop"), Graphics.TEXT_JUSTIFY_CENTER);
 
-        // Draw heart rate values
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.34 - 20, Graphics.FONT_SMALL, friend_heartrate, Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 0.66 - 20, Graphics.FONT_SMALL, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
+        // Get current time
+        var clockTime = System.getClockTime();
+        var hours = clockTime.hour;
+        if(hours > 12){
+            hours = hours - 12;
+        }
+        else if(hours == 0){
+            hours = 12;
+        }
 
+        // Draw for larger watches
+        if(size == 1){
+            // Draw heart rates
+            dc.setColor(friendColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(291, 79, Graphics.FONT_SMALL, friend_heartrate, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.setColor(selfColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(105, 275, Graphics.FONT_SMALL, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
+
+
+            // Draw time
+            dc.setColor(timeColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(108, 77, robotoBoldLarge, hours, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(256, 195, robotoBoldExtraLarge, clockTime.min.format("%02d"), Graphics.TEXT_JUSTIFY_CENTER);
+        }
+
+        // Draw for smaller watches
+        else{
+            // Draw heart rates
+            dc.setColor(friendColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(188, 49, Graphics.FONT_SMALL, friend_heartrate, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.setColor(selfColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(65, 170, Graphics.FONT_SMALL, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
+
+
+            // Draw time
+            dc.setColor(timeColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(66, 48, robotoBoldLarge, hours, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(157, 118, robotoBoldExtraLarge, clockTime.min.format("%02d"), Graphics.TEXT_JUSTIFY_CENTER);
+        }
+
+        /*
+        // Scratch everything entirely
+        dc.clear();
+        var clockBackground = WatchUi.loadResource(Rez.Drawables.clockBackground) as BitmapResource;
+        dc.drawBitmap(0, 0, clockBackground);
+        */
     }
 
     // Called when this View is removed from the screen. Save the

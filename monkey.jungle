@@ -1,1 +1,9 @@
 project.manifest = manifest.xml
+
+# Set code based on size of watch
+# small = 240x240
+# large = 390x390
+base.excludeAnnotations = stable
+
+round-240x240.excludeAnnotations = large
+round-390x390.excludeAnnotations = small

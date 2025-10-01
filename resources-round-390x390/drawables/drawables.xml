@@ -1,6 +1,6 @@
 <drawables xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
-    <bitmap id="splitViewDisconnected" filename="splitViewDisconnected.svg" dithering="none" />
-    <bitmap id="splitViewOffline" filename="splitViewOffline.svg" dithering="none" />
-    <bitmap id="splitViewOnlineMe" filename="splitViewOnlineMe.svg" dithering="none" />
-    <bitmap id="splitViewOnlineFriend" filename="splitViewOnlineFriend.svg" dithering="none" />
+    <bitmap id="backgroundDisconnected" filename="backgroundDisconnected.svg" dithering="floyd_steinberg" />
+    <bitmap id="backgroundOffline" filename="backgroundOffline.svg" dithering="floyd_steinberg" />
+    <bitmap id="backgroundOnlineMe" filename="backgroundOnlineMe.svg" dithering="floyd_steinberg" />
+    <bitmap id="backgroundOnlineFriend" filename="backgroundOnlineFriend.svg" dithering="floyd_steinberg" />
 </drawables>
