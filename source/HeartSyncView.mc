@@ -83,7 +83,7 @@ class HeartSyncView extends WatchUi.View {
 
             // Vibrate otherwise
             else{
-                Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
+                Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), Application.Properties.getValue("vibration_length_prop"))]);
             }
             System.println("Vibrate Time: " + vibrateTime);
             heartRateTimer.start(method(:onHeartRateUpdate), 60000 / vibrateTime, false);
@@ -91,7 +91,7 @@ class HeartSyncView extends WatchUi.View {
 
         // Always vibrate for self
         else{
-            Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), 100)]);
+            Attention.vibrate([new Attention.VibeProfile(Application.Properties.getValue("vibration_strength_prop"), Application.Properties.getValue("vibration_length_prop"))]);
             System.println("Vibrate Time: " + heartRate);
             heartRateTimer.start(method(:onHeartRateUpdate), 60000 / heartRate, false);
         }

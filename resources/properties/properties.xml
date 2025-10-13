@@ -5,12 +5,14 @@
         <property id="friend_username_prop" type="string"></property>
         <property id="vibration_strength_prop" type="number">25</property>
         <property id="whovibrate_prop" type="number">1</property>
+        <property id="vibration_length_prop" type="number">100</property>
     </properties>
 
     <strings>
        <string id="username_title">Username (Public)</string>
        <string id="friend_username_title">Friend's Username</string>
        <string id="vibration_strength_title">Vibration Strength (0-100)</string>
+       <string id="vibration_length_title">Vibration Duration (ms)</string>
     </strings>
 
     <settings>
@@ -22,6 +24,9 @@
         </setting>
         <setting propertyKey="@Properties.vibration_strength_prop" title="@Strings.vibration_strength_title">
             <settingConfig type="numeric" min="0" max="100" required="true" />
+        </setting>
+        <setting propertyKey="@Properties.vibration_length_prop" title="@Strings.vibration_length_title">
+            <settingConfig type="numeric" min="0" required="true" />
         </setting>
         <setting  propertyKey="@Properties.whovibrate_prop" title="Who Vibrates?">
             <settingConfig type="list">
