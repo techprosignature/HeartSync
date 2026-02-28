@@ -1,6 +1,14 @@
 <drawables xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
-    <bitmap id="backgroundDisconnected" filename="backgroundDisconnected.svg" dithering="floyd_steinberg" />
-    <bitmap id="backgroundOffline" filename="backgroundOffline.svg" dithering="floyd_steinberg" />
-    <bitmap id="backgroundOnlineMe" filename="backgroundOnlineMe.svg" dithering="floyd_steinberg" />
-    <bitmap id="backgroundOnlineFriend" filename="backgroundOnlineFriend.svg" dithering="floyd_steinberg" />
+    <bitmap id="backgroundGreenBlue" filename="backgroundGreenBlue.svg" dithering="floyd_steinberg" />
+    <bitmap id="backgroundPurpleRed" filename="backgroundPurpleRed.svg" dithering="floyd_steinberg" />
+    <bitmap id="foregroundOnlineMe" filename="foregroundOnlineMe.svg" dithering="floyd_steinberg">
+        <palette>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="foregroundOnlineFriend" filename="foregroundOnlineFriend.svg" dithering="floyd_steinberg">
+        <palette>
+            <color>000000</color>
+        </palette>
+    </bitmap>
 </drawables>

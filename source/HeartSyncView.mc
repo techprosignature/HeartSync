@@ -3,6 +3,7 @@ import Toybox.WatchUi;
 import Toybox.Sensor;
 import Toybox.Timer;
 import Toybox.Lang;
+import Toybox.System;
 
 class HeartSyncView extends WatchUi.View {
 
@@ -12,6 +13,19 @@ class HeartSyncView extends WatchUi.View {
     private var status = 0; // 0 = disconnected, 1 = offline, 2 = online
     private var robotoBoldExtraLarge as FontResource;
     private var robotoBoldLarge as FontResource;
+
+    private var backgroundData = [
+        {
+            :upperColor => 0x6CF983 as Lang.Number,
+            :lowerColor => 0x338BFF as Lang.Number,
+            :background => Rez.Drawables.backgroundGreenBlue
+        },
+        {
+            :upperColor => 0xF96CF0 as Lang.Number,
+            :lowerColor => 0xFF3336 as Lang.Number,
+            :background => Rez.Drawables.backgroundPurpleRed
+        }
+    ];
 
     (:small) private const size = 0; // small watch
     (:large) private const size = 1; // large watch
@@ -161,41 +175,46 @@ class HeartSyncView extends WatchUi.View {
         dc.clear();
 
         // Draw background based on who to vibrate for
-        var background;
+        var selectedBackground = Application.Properties.getValue("backgroundcolor_prop");
 
         // Set label colors based on status
         var selfColor;
         var friendColor;
+        var batteryColor;
         var timeColor;
 
         // Update background and colors based on connection status
         if(status == 0){
-            background = WatchUi.loadResource(Rez.Drawables.backgroundDisconnected) as BitmapResource;
+            dc.setColor(0xAEAEAE, 0xAEAEAE);
+            dc.fillRectangle(0, 0, 390, 390);
+            dc.drawBitmap(0, 0, WatchUi.loadResource(Rez.Drawables.foregroundOnlineMe) as BitmapResource);
             selfColor = 0xAEAEAE;
             friendColor = 0xAEAEAE;
+            batteryColor = 0xAEAEAE;
             timeColor = 0xFFFFFF;
         }
         else if(status == 1){
-            background = WatchUi.loadResource(Rez.Drawables.backgroundOffline) as BitmapResource;
-            selfColor = 0x338BFF;
+            dc.drawBitmap(0, 0, WatchUi.loadResource(backgroundData[selectedBackground][:background]) as BitmapResource);
+            dc.drawBitmap(0, 0, WatchUi.loadResource(Rez.Drawables.foregroundOnlineMe) as BitmapResource);
+            selfColor = backgroundData[selectedBackground][:lowerColor];
+            batteryColor = backgroundData[selectedBackground][:upperColor];
             friendColor = 0xAEAEAE;
             timeColor = 0xFFFFFF;
         }
         else{
-            selfColor = 0x338BFF;
-            friendColor = 0x6CF983;
+            selfColor = backgroundData[selectedBackground][:lowerColor];
+            friendColor = backgroundData[selectedBackground][:upperColor];
+            batteryColor = backgroundData[selectedBackground][:upperColor];
+            dc.drawBitmap(0, 0, WatchUi.loadResource(backgroundData[selectedBackground][:background]) as BitmapResource);
             if(Application.Properties.getValue("whovibrate_prop") == 1){
                 timeColor = 0x000000;
-                background = WatchUi.loadResource(Rez.Drawables.backgroundOnlineFriend) as BitmapResource;
+                dc.drawBitmap(0, 0, WatchUi.loadResource(Rez.Drawables.foregroundOnlineFriend) as BitmapResource);
             }
             else{
                 timeColor = 0xFFFFFF;
-                background = WatchUi.loadResource(Rez.Drawables.backgroundOnlineMe) as BitmapResource;
+                dc.drawBitmap(0, 0, WatchUi.loadResource(Rez.Drawables.foregroundOnlineMe) as BitmapResource);
             }
         }
-
-        // Draw background
-        dc.drawBitmap(0, 0, background);
 
         // Read heart rate sensor
         var sensorInfo = Sensor.getInfo();
@@ -209,8 +228,6 @@ class HeartSyncView extends WatchUi.View {
             friend_heartrate = "--";
         }
 
-        // Draw names
-
         // Get current time
         var clockTime = System.getClockTime();
         var hours = clockTime.hour;
@@ -221,6 +238,10 @@ class HeartSyncView extends WatchUi.View {
             hours = 12;
         }
 
+        // Get current battery level
+        var batteryLevel = System.getSystemStats().battery;
+
+
         // Draw for larger watches
         if(size == 1){
             // Draw heart rates
@@ -229,6 +250,9 @@ class HeartSyncView extends WatchUi.View {
             dc.setColor(selfColor, Graphics.COLOR_TRANSPARENT);
             dc.drawText(105, 275, Graphics.FONT_SMALL, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
 
+            // Draw baterry level
+            dc.setColor(batteryColor, batteryColor);
+            dc.fillRoundedRectangle(177, 34, 36 * (batteryLevel / 100), 16, 5);
 
             // Draw time
             dc.setColor(timeColor, Graphics.COLOR_TRANSPARENT);
@@ -244,7 +268,10 @@ class HeartSyncView extends WatchUi.View {
             dc.setColor(selfColor, Graphics.COLOR_TRANSPARENT);
             dc.drawText(65, 170, Graphics.FONT_SMALL, heartRate, Graphics.TEXT_JUSTIFY_CENTER);
 
-
+            // Draw baterry level
+            dc.setColor(batteryColor, batteryColor);
+            dc.fillRoundedRectangle(118.5, 23.5, 18 * (batteryLevel / 100), 9, 3);
+            
             // Draw time
             dc.setColor(timeColor, Graphics.COLOR_TRANSPARENT);
             dc.drawText(66, 48, robotoBoldLarge, hours, Graphics.TEXT_JUSTIFY_CENTER);
