@@ -14,16 +14,16 @@ class HeartSyncView extends WatchUi.View {
     private var robotoBoldExtraLarge as FontResource;
     private var robotoBoldLarge as FontResource;
 
-    private var backgroundData = [
+    private var backgroundData as Array<Dictionary<Symbol, Lang.Number or Lang.ResourceId>> = [
         {
             :upperColor => 0x6CF983 as Lang.Number,
             :lowerColor => 0x338BFF as Lang.Number,
-            :background => Rez.Drawables.backgroundGreenBlue
+            :background => Rez.Drawables.backgroundGreenBlue as Lang.ResourceId
         },
         {
             :upperColor => 0xF96CF0 as Lang.Number,
             :lowerColor => 0xFF3336 as Lang.Number,
-            :background => Rez.Drawables.backgroundPurpleRed
+            :background => Rez.Drawables.backgroundPurpleRed as Lang.ResourceId
         }
     ];
 
@@ -77,7 +77,7 @@ class HeartSyncView extends WatchUi.View {
         
         // Read heart rate sensor
         var sensorInfo = Sensor.getInfo();
-        if(sensorInfo has :heartRate && sensorInfo.heartRate != null){
+        if(sensorInfo.heartRate != null){
             heartRate = sensorInfo.heartRate;
         }
 
@@ -175,7 +175,7 @@ class HeartSyncView extends WatchUi.View {
         dc.clear();
 
         // Draw background based on who to vibrate for
-        var selectedBackground = Application.Properties.getValue("backgroundcolor_prop");
+        var selectedBackground = Application.Properties.getValue("backgroundcolor_prop") as Lang.Number;
 
         // Set label colors based on status
         var selfColor;
@@ -218,7 +218,7 @@ class HeartSyncView extends WatchUi.View {
 
         // Read heart rate sensor
         var sensorInfo = Sensor.getInfo();
-        if(sensorInfo has :heartRate && sensorInfo.heartRate != null){
+        if(sensorInfo.heartRate != null){
             heartRate = sensorInfo.heartRate;
         }
 
