@@ -252,7 +252,7 @@ class HeartSyncView extends WatchUi.View {
 
             // Draw baterry level
             dc.setColor(batteryColor, batteryColor);
-            dc.fillRoundedRectangle(177, 34, 36 * (batteryLevel / 100), 16, 5);
+            dc.fillRoundedRectangle(185, 34, 36 * (batteryLevel / 100), 16, 5);
 
             // Draw time
             dc.setColor(timeColor, Graphics.COLOR_TRANSPARENT);
